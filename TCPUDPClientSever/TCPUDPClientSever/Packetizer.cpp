@@ -12,20 +12,22 @@ Intended to be the packetizer, but went unused.
 void Packetizer::updatePacketList () {
 	if (packet_list.size () > 0)
 		packet_list.pop_front ();//erase (packet_list.begin ());
-	if (packet_list.size () < PACKET_LIST_MAX && (currentLine < getLines () - 1 || temp_buffer.length () > 0))
+	if (packet_list.size () < PACKET_LIST_MAX && currentLine < getLines () - 1)
 		appendPackets ();
 }
 
 //this function appends packets to the end of the packet_list.
 void Packetizer::appendPackets () {
-	size_t i;
-	for (i = packet_list.size (); i < PACKET_LIST_MAX; i++)
+	while (packet_list.size() < PACKET_LIST_MAX)
 		packet_list.push_back (buildPacket ());
 }
 
 //this function will add a single line from a edit box to the temp_buffer.
 void Packetizer::populateBuffer () {
-	temp_buffer.append (getLine (currentLine++));
+	//if (show_data)
+		temp_buffer.append (getLine (currentLine++));
+	//else
+		//temp_buffer.append(readFile());
 }
 
 //checks to see if it can retrieve any more packets.

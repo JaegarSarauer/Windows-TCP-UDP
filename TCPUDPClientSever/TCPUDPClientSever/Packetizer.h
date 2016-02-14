@@ -19,7 +19,7 @@ class Packetizer {
 
 	public:
 
-	Packetizer (int curLine = 0) : currentLine (curLine) {};
+	Packetizer (long curLine = 0) : currentLine (curLine) {};
 
 	//this gets called when a packet is successfully sent.
 	//it will pop the front packet off, and push on a new one.
@@ -45,10 +45,11 @@ class Packetizer {
 	bool availablePacket ();
 
 	private:
-	int currentLine;
+	long currentLine;
 	std::deque<std::string> packet_list;
 	std::string temp_buffer;
-	bool addEOT = TRUE;
+	LPSTR file;
+	bool doneReading = FALSE;
 };
 
 

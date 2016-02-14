@@ -49,6 +49,7 @@ DWORD WINAPI createFileReader (LPVOID lpParam) {
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,
 		(HANDLE)hMain);
+	CloseHandle(hf);
 	return 0;
 }
 
@@ -88,6 +89,7 @@ DWORD WINAPI createFileWriter (LPVOID lpParam) {
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL,
 		(HANDLE)hMain);
+	CloseHandle(hf);
 	return 0;
 }
 
@@ -134,8 +136,6 @@ void loadFileToView (LPSTR file) {
 
 	inputF.close ();
 }
-
-
 
 
 

@@ -2,7 +2,7 @@
 #include "Application.h"
 
 // owner window
-HWND hwnd;              
+HWND hwnd;
 MSG Msg;
 
 //handle of the file opener.
@@ -21,31 +21,44 @@ int commandID;
 int port = DEFAULT_PORT_NUMBER;
 int packet_size = DEFAULT_BUFFER_SIZE;
 
+struct Statistics *stats;
+
 int prog_type;
 int proto_type;
 
 bool Connection_Setup = FALSE;
 
+bool show_data;
 
-int WINAPI WinMain (HINSTANCE hInst, HINSTANCE hprevInstance,
+
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hprevInstance,
 	LPSTR lspszCmdParam, int nCmdShow) {
 
 	progInst = hInst;
 	commandID = nCmdShow;
 
 	// State - Build Window
-	hStart = CreateDialogParam (hInst, MAKEINTRESOURCE (IDD_SETUP), 0, WndProc, 0);
-	ShowWindow (hStart, nCmdShow);
+	hStart = CreateDialogParam(hInst, MAKEINTRESOURCE(IDD_SETUP), 0, WndProc, 0);
+	ShowWindow(hStart, nCmdShow);
 
 
-	SendMessage (GetDlgItem (hStart, IDC_CLIENT_RADIO), BM_SETCHECK, BST_CHECKED, NULL);
-	SendMessage (GetDlgItem (hStart, IDC_TCP_RADIO), BM_SETCHECK, BST_CHECKED, NULL);
+	SendMessage(GetDlgItem(hStart, IDC_CLIENT_RADIO), BM_SETCHECK, BST_CHECKED, NULL);
+	SendMessage(GetDlgItem(hStart, IDC_TCP_RADIO), BM_SETCHECK, BST_CHECKED, NULL);
 
-	initFileOpener ();
-	
-	while (GetMessage (&Msg, NULL, 0, 0)) {
-		TranslateMessage (&Msg);
-		DispatchMessage (&Msg);
+	stats = (Statistics *)malloc(sizeof(Statistics));
+	stats = new Statistics();
+	stats->status = "Waiting";
+
+	stats->fileLoad = 0;
+	stats->fileLoadTotal = 0;
+	stats->packets = 0;
+	stats->time = 0;
+
+	initFileOpener();
+
+	while (GetMessage(&Msg, NULL, 0, 0)) {
+		TranslateMessage(&Msg);
+		DispatchMessage(&Msg);
 	}
 
 	return Msg.wParam;
@@ -55,15 +68,15 @@ int WINAPI WinMain (HINSTANCE hInst, HINSTANCE hprevInstance,
 
 
 
-int IsProgramClient () {
-	if (SendMessage (GetDlgItem (hStart, IDC_CLIENT_RADIO), BM_GETCHECK, NULL, NULL) == BST_CHECKED)
+int IsProgramClient() {
+	if (SendMessage(GetDlgItem(hStart, IDC_CLIENT_RADIO), BM_GETCHECK, NULL, NULL) == BST_CHECKED)
 		return PROGRAM_CLIENT;
 	else
 		return PROGRAM_SERVER;
 }
 
-int IsProtocolTCP () {
-	if (SendMessage (GetDlgItem (hStart, IDC_TCP_RADIO), BM_GETCHECK, NULL, NULL) == BST_CHECKED)
+int IsProtocolTCP() {
+	if (SendMessage(GetDlgItem(hStart, IDC_TCP_RADIO), BM_GETCHECK, NULL, NULL) == BST_CHECKED)
 		return PROTOCOL_TCP;
 	else
 		return PROTOCOL_UDP;
@@ -71,116 +84,137 @@ int IsProtocolTCP () {
 
 
 const int tmpSize = 8;
-void StartMainWindow () {
+void StartMainWindow() {
 	char tmp[tmpSize];
 
-	hMain = CreateDialogParam (progInst, MAKEINTRESOURCE (IDD_MAIN_WINDOW), 0, WndProc, 0);
-	ShowWindow (hMain, commandID);
+	hMain = CreateDialogParam(progInst, MAKEINTRESOURCE(IDD_MAIN_WINDOW), 0, WndProc, 0);
+	ShowWindow(hMain, commandID);
 
 	//set max sizes for the UI elements.
-	SendMessage (GetDlgItem (hMain, IDC_DATA_BOX), EM_SETLIMITTEXT, (LPARAM)MAX_DATA, NULL);
-	SendMessage (GetDlgItem (hMain, IDC_PORT_EDIT), EM_SETLIMITTEXT, (LPARAM)tmpSize, NULL);
-	SendMessage (GetDlgItem (hMain, IDC_PACKET_SIZE), EM_SETLIMITTEXT, (LPARAM)tmpSize, NULL);
-
+	SendMessage(GetDlgItem(hMain, IDC_DATA_BOX), EM_SETLIMITTEXT, (LPARAM)MAX_DATA, NULL);
+	SendMessage(GetDlgItem(hMain, IDC_PORT_EDIT), EM_SETLIMITTEXT, (LPARAM)tmpSize, NULL);
+	SendMessage(GetDlgItem(hMain, IDC_PACKET_SIZE), EM_SETLIMITTEXT, (LPARAM)tmpSize, NULL);
+	SendMessage(GetDlgItem(hMain, IDC_SHOW_DATA), BM_SETCHECK, BST_CHECKED, 0);
+	checkBoxChecked();
 
 	//set a default port number in GUI
-	sprintf_s (tmp, "%d", port);
-	Edit_SetText (GetDlgItem (hMain, IDC_PORT_EDIT), tmp);
+	sprintf_s(tmp, "%d", port);
+	Edit_SetText(GetDlgItem(hMain, IDC_PORT_EDIT), tmp);
 
 	//set a default packet size in GUI
-	sprintf_s (tmp, "%d", packet_size);
-	Edit_SetText (GetDlgItem (hMain, IDC_PACKET_SIZE), tmp);
-		
+	sprintf_s(tmp, "%d", packet_size);
+	Edit_SetText(GetDlgItem(hMain, IDC_PACKET_SIZE), tmp);
+
+
+	updateStatsWindow(stats);
+
 	switch (prog_type) {
-		case PROGRAM_CLIENT:
-			SetupAsClient ();
-			break;
-		case PROGRAM_SERVER:
-			SetupAsServer ();
-			break;
-		default:
-			break;
+	case PROGRAM_CLIENT:
+		SetupAsClient();
+		break;
+	case PROGRAM_SERVER:
+		SetupAsServer();
+		break;
+	default:
+		break;
 	}
 }
 
-void GetConnectionParameters () {
+void GetConnectionParameters() {
 	char tmp[tmpSize];
-	GetWindowText (GetDlgItem (hMain, IDC_PORT_EDIT), tmp, tmpSize);
-	port = atoi (tmp);
+	GetWindowText(GetDlgItem(hMain, IDC_PORT_EDIT), tmp, tmpSize);
+	port = atoi(tmp);
 
-	GetWindowText (GetDlgItem (hMain, IDC_PACKET_SIZE), tmp, tmpSize);
-	packet_size = atoi (tmp);
+	GetWindowText(GetDlgItem(hMain, IDC_PACKET_SIZE), tmp, tmpSize);
+	packet_size = atoi(tmp);
 }
 
-INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+void updateStatsWindow(struct Statistics *s) {
+	char tmp[1024];
+	switch (prog_type) {
+	case PROGRAM_CLIENT:
+		sprintf_s(tmp, "Status: %s\r\nFile Loaded: %d/%d\r\nPackets Sent: %d\r\nTransfer Time: %ul", s->status, s->fileLoad, s->fileLoadTotal, s->packets, s->time);
+		break;
+	case PROGRAM_SERVER:
+		sprintf_s(tmp, "Status: %s\r\nPackets Recieved: %d\r\nTransfer Time: %ul", s->status, s->packets, s->time);
+		break;
+	}
+	Edit_SetText(GetDlgItem(hMain, IDC_STATS_BOX), tmp);
+}
+
+INT_PTR CALLBACK WndProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
-		case WM_COMMAND:
-			switch (LOWORD (wParam)) {
-				/*case IDC_PRIORITYCHECK:
-					switch (HIWORD (wParam)) {
-						case BN_CLICKED:
-							checkBoxChecked ();
-							break;
-					}
-					break;*/
-				case IDC_ACTION_BUTTON:
-					GetConnectionParameters ();
-					if (packet_size < 4) {
-						MessageBox (hwnd, "Packet size must be at least 4 chars.", "Larger Packets?!", MB_OK);
-						break;
-					}
-					switch (prog_type) {
-						case PROGRAM_CLIENT:
-							ConnectClient ();
-							if (Connection_Setup)
-								switch (proto_type) {
-									case PROTOCOL_TCP:
-										RunTCPClient ();
-										break;
-									case PROTOCOL_UDP:
-										RunUDPClient ();
-										break;
-									default:
-										break;
-								}
-							break;
-						case PROGRAM_SERVER:
-							ConnectServer ();
-							if (Connection_Setup)
-								StartServerThread ();
-							break;
-						default:
-							break;
-					}
-					CloseConnection();
-					break;
-				case IDC_OPEN_BUTTON:
-					setFileOpenerFlags (OPEN_BROWSER);
-					if (GetOpenFileName (&ofn) == TRUE) {
-						CreateThread (NULL, 0, createFileReader, NULL, 0, NULL);
-						loadFileToView (ofn.lpstrFile);
-					}
-					break;
-				case IDC_EXIT_BUTTON:
-				case IDC_EXIT_START:
-					CloseConnection ();
-					PostQuitMessage (0);
-					break;
-				case IDC_START_BUTTON:
-					prog_type = IsProgramClient ();
-					proto_type = IsProtocolTCP ();
-					StartMainWindow ();
-					DestroyWindow (hStart);
-					break;
+	case WM_COMMAND:
+		switch (LOWORD(wParam)) {
+		case IDC_SHOW_DATA:
+			switch (HIWORD(wParam)) {
+			case BN_CLICKED:
+				checkBoxChecked();
+				break;
 			}
 			break;
-
-		case WM_CLOSE:	// Terminate program
-			CloseConnection ();
-			PostQuitMessage (0);
+		case IDC_CLEAR_BUTTON:
+			clearBox();
 			break;
-		default:
-			return false;
+		case IDC_ACTION_BUTTON:
+			GetConnectionParameters();
+			if (packet_size < 4) {
+				MessageBox(hwnd, "Packet size must be at least 4 chars.", "Larger Packets?!", MB_OK);
+				break;
+			}
+			stats->status = "Connecting";
+			switch (prog_type) {
+			case PROGRAM_CLIENT:
+				ConnectClient();
+				if (Connection_Setup)
+					switch (proto_type) {
+					case PROTOCOL_TCP:
+						RunTCPClient();
+						break;
+					case PROTOCOL_UDP:
+						RunUDPClient();
+						break;
+					default:
+						break;
+					}
+				break;
+			case PROGRAM_SERVER:
+				ConnectServer();
+				if (Connection_Setup)
+					StartServerThread();
+				break;
+			default:
+				break;
+			}
+			CloseConnection();
+			break;
+		case IDC_OPEN_BUTTON:
+			setFileOpenerFlags(OPEN_BROWSER);
+			if (GetOpenFileName(&ofn) == TRUE) {
+				CreateThread(NULL, 0, createFileReader, NULL, 0, NULL);
+				loadFileToView(ofn.lpstrFile);
+			}
+			break;
+		case IDC_EXIT_BUTTON:
+		case IDC_EXIT_START:
+			CloseConnection();
+			PostQuitMessage(0);
+			break;
+		case IDC_START_BUTTON:
+			prog_type = IsProgramClient();
+			proto_type = IsProtocolTCP();
+			StartMainWindow();
+			DestroyWindow(hStart);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:	// Terminate program
+		CloseConnection();
+		PostQuitMessage(0);
+		break;
+	default:
+		return false;
 	}
 	return 0;
 }
@@ -211,15 +245,15 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 --
 -------------------------------------------------------------------------------------------------------------------*/
 //adds a line to whatever handle you would like. It is expected to pass in a file holder as the handle.
-void addLine (std::string line) {
+void addLine(std::string line) {
 	int idx;
-	HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
+	HWND box = GetDlgItem(hMain, IDC_DATA_BOX);
 
-	idx = GetWindowTextLength (box);
-	std::regex e ("(?!\r)\n");
-	std::string tmp = std::regex_replace (line, e, "\r\n");
-	SendMessage (box, EM_SETSEL, (LPARAM)idx, (LPARAM)idx);
-	SendMessage (box, EM_REPLACESEL, 0, (LPARAM)tmp.c_str ());
+	idx = GetWindowTextLength(box);
+	std::regex e("(?!\r)\n");
+	std::string tmp = std::regex_replace(line, e, "\r\n");
+	SendMessage(box, EM_SETSEL, (LPARAM)idx, (LPARAM)idx);
+	SendMessage(box, EM_REPLACESEL, 0, (LPARAM)tmp.c_str());
 }
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -243,9 +277,9 @@ void addLine (std::string line) {
 --
 -------------------------------------------------------------------------------------------------------------------*/
 //returns the amount of lines in the specific handle.
-int getLines () {
-	HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
-	return SendMessage (box, EM_GETLINECOUNT, NULL, NULL);
+int getLines() {
+	HWND box = GetDlgItem(hMain, IDC_DATA_BOX);
+	return SendMessage(box, EM_GETLINECOUNT, NULL, NULL);
 }
 
 
@@ -271,15 +305,15 @@ int getLines () {
 --
 -------------------------------------------------------------------------------------------------------------------*/
 //this function targets a handle and gets the line as string at an index you choose.
-std::string getLine (int line) {
+std::string getLine(int line) {
 	size_t len;
 	TCHAR *tmp;
-	HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
+	HWND box = GetDlgItem(hMain, IDC_DATA_BOX);
 
-	len = SendMessage (box, EM_LINELENGTH, SendMessage (box, EM_LINEINDEX, line, 0), NULL);
+	len = SendMessage(box, EM_LINELENGTH, SendMessage(box, EM_LINEINDEX, line, 0), NULL);
 	tmp = new TCHAR[len];
 	*tmp = 0;
-	SendMessage (box, EM_GETLINE, line, (LPARAM)tmp);
+	SendMessage(box, EM_GETLINE, line, (LPARAM)tmp);
 	tmp[len] = '\0';
 	return tmp;
 }
@@ -304,6 +338,32 @@ std::string getLine (int line) {
 --	NOTES:			This function takes in a handle to a UI element, and sets it's text to be an empty string. It
 --					is inteded to be called when the user clicks on one of the clear buttons for the Edit Boxes.
 -------------------------------------------------------------------------------------------------------------------*/
-void clearBox () {
-	SetWindowText (GetDlgItem (hMain, IDC_DATA_BOX), "");
+void clearBox() {
+	SetWindowText(GetDlgItem(hMain, IDC_DATA_BOX), "");
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+--	FUNCTION:		checkBoxChecked
+--
+--	DATE:			November 30th, 2015
+--
+--	DESIGNER:		Jaegar Sarauer
+--
+--	REVISIONS:		Jaegar Sarauer - Version 1
+--
+--	PROGRAMMER:		Jaegar Sarauer
+--
+--	INTERFACE:		void checkBoxChecked();
+--
+--	RETURNS:		VOID
+--
+--	NOTES: 			This function updates the priority from the check
+--					box on the GUI, next to the "Send" button. It is intended
+--					to be called when the user clicks on the checkbox,
+--					allowing the status to be updated.
+-------------------------------------------------------------------------------------------------------------------*/
+void checkBoxChecked() {
+	show_data = SendMessage(GetDlgItem(hMain, IDC_SHOW_DATA), BM_GETCHECK, 0, 0);
+	ShowWindow(GetDlgItem(hMain, IDC_DATA_BOX), show_data);
 }

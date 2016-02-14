@@ -8,7 +8,6 @@ WSADATA WSAData;
 
 struct hostent	*hp;
 
-Packetizer packetizer = Packetizer ();
 
 void SetupAsClient () {
 	Button_SetText (GetDlgItem (hMain, IDC_ACTION_BUTTON), "Send");
@@ -60,6 +59,7 @@ void ConnectClient() {
 }
 
 void RunTCPClient () {
+	Packetizer packetizer = Packetizer();
 	packetizer.appendPackets ();
 	while (packetizer.availablePacket()) {
 		send (ProgSocket, packetizer.getPacket().c_str(), packet_size, 0);
@@ -70,6 +70,7 @@ void RunTCPClient () {
 }
 
 void RunUDPClient () {
+	Packetizer packetizer = Packetizer();
 	int server_len = sizeof (server);
 	packetizer.appendPackets ();
 	while (packetizer.availablePacket ()) {

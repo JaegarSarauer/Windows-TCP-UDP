@@ -17,7 +17,7 @@
 #define OPEN_BROWSER	2531
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-
+#pragma warning(disable: 4996)
 #pragma comment(lib, "Ws2_32.lib")
 
 //#include <windows.h>
@@ -56,9 +56,11 @@ extern SOCKET ProgSocket;
 extern WSADATA WSAData;
 
 extern struct sockaddr_in server;
+extern struct Stats *stats;
 
 extern int prog_type;
 extern int proto_type;
+extern bool show_data;
 
 extern HANDLE		hf;              // file handle
 extern OPENFILENAME ofn;			 // common dialog box structure
@@ -72,6 +74,14 @@ extern HWND hwnd;
 struct ServiceThreadParams {
 	SOCKET ConnectionSocket;
 };
+
+struct Statistics {
+	std::string status;
+	int fileLoad;
+	int fileLoadTotal;
+	int packets;
+	long time;
+} Stats;
 
 
 void ConnectClient ();
