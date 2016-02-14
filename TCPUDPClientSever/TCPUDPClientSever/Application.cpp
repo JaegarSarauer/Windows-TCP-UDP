@@ -152,6 +152,7 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 						default:
 							break;
 					}
+					CloseConnection();
 					break;
 				case IDC_OPEN_BUTTON:
 					setFileOpenerFlags (OPEN_BROWSER);

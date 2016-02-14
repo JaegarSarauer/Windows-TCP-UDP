@@ -41,6 +41,7 @@ void ConnectClient() {
 	/*if (bind (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == -1) {
 		CloseConnection ();
 		MessageBox (hwnd, "Unable to bind to socket", "Unable to Bind", MB_OK);
+		return;
 	}*/
 
 	// Connecting to the server

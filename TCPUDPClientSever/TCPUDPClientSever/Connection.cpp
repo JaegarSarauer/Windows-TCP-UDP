@@ -36,5 +36,6 @@ void CreateSocket () {
 void CloseConnection () {
 	Connection_Setup = FALSE;
 	closesocket (ProgSocket);
+	ProgSocket = 0;
 	WSACleanup ();
 }
