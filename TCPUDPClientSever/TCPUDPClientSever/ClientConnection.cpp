@@ -10,7 +10,7 @@ struct hostent	*hp;
 
 Packetizer packetizer = Packetizer ();
 
-void SetupAsClient (bool isTCP) {
+void SetupAsClient () {
 	Button_SetText (GetDlgItem (hMain, IDC_ACTION_BUTTON), "Send");
 	SendMessage (GetDlgItem (hMain, IDC_DATA_BOX), EM_SETREADONLY, (LPARAM)FALSE, NULL);
 }
@@ -38,8 +38,14 @@ void ConnectClient() {
 	// Copy the server address
 	memcpy ((char *)&server.sin_addr, hp->h_addr, hp->h_length);
 
+	/*if (bind (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == -1) {
+		CloseConnection ();
+		MessageBox (hwnd, "Unable to bind to socket", "Unable to Bind", MB_OK);
+	}*/
+
 	// Connecting to the server
 	if (connect (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == -1) {
+		CloseConnection ();
 		MessageBox (hwnd, "Unable to connect to server!\nCheck Port and IP Address", "Error Connecting!", MB_OK);
 		return;
 	}
@@ -52,7 +58,7 @@ void ConnectClient() {
 	Connection_Setup = TRUE;
 }
 
-void RunClient () {
+void RunTCPClient () {
 	packetizer.appendPackets ();
 	while (packetizer.availablePacket()) {
 		send (ProgSocket, packetizer.getPacket().c_str(), packet_size, 0);
@@ -62,7 +68,16 @@ void RunClient () {
 	Connection_Setup = FALSE;
 }
 
-
+void RunUDPClient () {
+	int server_len = sizeof (server);
+	packetizer.appendPackets ();
+	while (packetizer.availablePacket ()) {
+		sendto (ProgSocket, packetizer.getPacket ().c_str (), packet_size, 0, (struct sockaddr *)&server, server_len);
+		packetizer.updatePacketList ();
+	}
+	closesocket (ProgSocket);
+	Connection_Setup = FALSE;
+}
 
 
 

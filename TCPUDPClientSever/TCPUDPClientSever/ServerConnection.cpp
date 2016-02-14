@@ -3,7 +3,7 @@
 struct sockaddr_in server;
 
 
-DWORD WINAPI RunServer (LPVOID lpParam) {
+DWORD WINAPI RunTCPServer (LPVOID lpParam) {
 	ServiceThreadParams *param = (ServiceThreadParams *)lpParam;
 	struct sockaddr_in client;
 	SOCKET ReadSocket;
@@ -48,7 +48,36 @@ DWORD WINAPI RunServer (LPVOID lpParam) {
 	return 0;
 }
 
-void SetupAsServer (bool isTCP) {
+DWORD WINAPI RunUDPServer (LPVOID lpParam) {
+	ServiceThreadParams *param = (ServiceThreadParams *)lpParam;
+	struct sockaddr_in client;
+	int dataRead;
+	char *inputBuffer = (char *)malloc (packet_size * sizeof (char));
+	bool transmissionEnded = FALSE;
+
+
+	//set socket to non-blocking
+	//u_long iMode = 1;
+	//ioctlsocket (ProgSocket, FIONBIO, &iMode);
+
+	while (Connection_Setup) {
+		int client_len = sizeof (client);
+		transmissionEnded = FALSE;
+		if ((dataRead = recvfrom (ProgSocket, inputBuffer, packet_size, 0, (struct sockaddr *)&client, &client_len))) {
+			if (dataRead != -1 && WSAGetLastError () != WSAEWOULDBLOCK) {
+				addLine (std::string (inputBuffer));
+				inputBuffer = (char *)malloc (packet_size * sizeof (char));
+			} else {
+				transmissionEnded = TRUE;
+			}
+		}
+	}
+	
+	return 0;
+}
+
+
+void SetupAsServer () {
 	Button_SetText (GetDlgItem (hMain, IDC_ACTION_BUTTON), "Allow Connections");
 	EnableWindow (GetDlgItem (hMain, IDC_IP), FALSE);
 }
@@ -63,10 +92,12 @@ void ConnectServer () {
 	server.sin_port = htons (port);
 	server.sin_addr.s_addr = htonl (INADDR_ANY); // Accept connections from any client
 
-	if (bind (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == -1) {
-		perror ("Can't bind name to socket");
-		exit (1);
-	}
+	/*if (bind (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == SOCKET_ERROR) {
+		CloseConnection ();
+		MessageBox (hwnd, "Unable to bind to socket", "Unable to Bind", MB_OK);
+		return;
+	}*/
+
 
 
 	MessageBox (hwnd, "Ready for connections.", "Success!", MB_OK);
@@ -76,5 +107,16 @@ void ConnectServer () {
 void StartServerThread () {
 	ServiceThreadParams *data = (ServiceThreadParams *)malloc (sizeof (ServiceThreadParams));
 	data->ConnectionSocket = ProgSocket;
-	HANDLE ServiceThread = CreateThread (NULL, 0, RunServer, data, 0, NULL);
+	HANDLE ServiceThread;
+
+	switch (proto_type) {
+		case PROTOCOL_TCP:
+			ServiceThread = CreateThread (NULL, 0, RunTCPServer, data, 0, NULL);
+			break;
+		case PROTOCOL_UDP:
+			ServiceThread = CreateThread (NULL, 0, RunUDPServer, data, 0, NULL);
+			break;
+		default:
+			break;
+	}
 }

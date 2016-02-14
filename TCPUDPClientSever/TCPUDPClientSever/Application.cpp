@@ -21,8 +21,8 @@ int commandID;
 int port = DEFAULT_PORT_NUMBER;
 int packet_size = DEFAULT_BUFFER_SIZE;
 
-bool isClient;
-bool isTCP;
+int prog_type;
+int proto_type;
 
 bool Connection_Setup = FALSE;
 
@@ -55,23 +55,23 @@ int WINAPI WinMain (HINSTANCE hInst, HINSTANCE hprevInstance,
 
 
 
-bool IsProgramClient () {
+int IsProgramClient () {
 	if (SendMessage (GetDlgItem (hStart, IDC_CLIENT_RADIO), BM_GETCHECK, NULL, NULL) == BST_CHECKED)
-		return true;
+		return PROGRAM_CLIENT;
 	else
-		return false;
+		return PROGRAM_SERVER;
 }
 
-bool IsProtocolTCP () {
+int IsProtocolTCP () {
 	if (SendMessage (GetDlgItem (hStart, IDC_TCP_RADIO), BM_GETCHECK, NULL, NULL) == BST_CHECKED)
-		return true;
+		return PROTOCOL_TCP;
 	else
-		return false;
+		return PROTOCOL_UDP;
 }
 
 
-void StartMainWindow (bool isClient, bool isTCP) {
-	const int tmpSize = 8;
+const int tmpSize = 8;
+void StartMainWindow () {
 	char tmp[tmpSize];
 
 	hMain = CreateDialogParam (progInst, MAKEINTRESOURCE (IDD_MAIN_WINDOW), 0, WndProc, 0);
@@ -91,12 +91,26 @@ void StartMainWindow (bool isClient, bool isTCP) {
 	sprintf_s (tmp, "%d", packet_size);
 	Edit_SetText (GetDlgItem (hMain, IDC_PACKET_SIZE), tmp);
 		
-	if (isClient)
-		SetupAsClient (isTCP);
-	else
-		SetupAsServer (isTCP);
+	switch (prog_type) {
+		case PROGRAM_CLIENT:
+			SetupAsClient ();
+			break;
+		case PROGRAM_SERVER:
+			SetupAsServer ();
+			break;
+		default:
+			break;
+	}
 }
 
+void GetConnectionParameters () {
+	char tmp[tmpSize];
+	GetWindowText (GetDlgItem (hMain, IDC_PORT_EDIT), tmp, tmpSize);
+	port = atoi (tmp);
+
+	GetWindowText (GetDlgItem (hMain, IDC_PACKET_SIZE), tmp, tmpSize);
+	packet_size = atoi (tmp);
+}
 
 INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	switch (uMsg) {
@@ -110,18 +124,33 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 					}
 					break;*/
 				case IDC_ACTION_BUTTON:
-					if (isClient) {
-						if (packet_size < 4) {
-							MessageBox (hwnd, "Packet size must be at least 4 chars.", "Larger Packets?!", MB_OK);
+					GetConnectionParameters ();
+					if (packet_size < 4) {
+						MessageBox (hwnd, "Packet size must be at least 4 chars.", "Larger Packets?!", MB_OK);
+						break;
+					}
+					switch (prog_type) {
+						case PROGRAM_CLIENT:
+							ConnectClient ();
+							if (Connection_Setup)
+								switch (proto_type) {
+									case PROTOCOL_TCP:
+										RunTCPClient ();
+										break;
+									case PROTOCOL_UDP:
+										RunUDPClient ();
+										break;
+									default:
+										break;
+								}
 							break;
-						}
-						ConnectClient ();
-						if (Connection_Setup)
-							RunClient ();
-					}  else {
-						ConnectServer ();
-						if (Connection_Setup)
-							StartServerThread ();
+						case PROGRAM_SERVER:
+							ConnectServer ();
+							if (Connection_Setup)
+								StartServerThread ();
+							break;
+						default:
+							break;
 					}
 					break;
 				case IDC_OPEN_BUTTON:
@@ -137,9 +166,9 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 					PostQuitMessage (0);
 					break;
 				case IDC_START_BUTTON:
-					isClient = IsProgramClient ();
-					isTCP = IsProtocolTCP ();
-					StartMainWindow (isClient, isTCP);
+					prog_type = IsProgramClient ();
+					proto_type = IsProtocolTCP ();
+					StartMainWindow ();
 					DestroyWindow (hStart);
 					break;
 			}

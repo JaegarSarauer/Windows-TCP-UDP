@@ -4,7 +4,6 @@
 #include "Shared.h"
 #include <Commctrl.h>
 
-void CloseConnection ();
 
 
 #endif

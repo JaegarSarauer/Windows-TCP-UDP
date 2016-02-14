@@ -4,17 +4,26 @@
 #define DEFAULT_PORT_NUMBER		4500
 #define DEFAULT_BUFFER_SIZE		512
 
+#define PROTOCOL_TCP			455
+#define PROTOCOL_UDP			456
+
+#define PROGRAM_CLIENT			545
+#define PROGRAM_SERVER			546
+
 /*-------------------------------
 *	File browser window variables
 -------------------------------*/
 #define SAVE_BROWSER	2530
 #define OPEN_BROWSER	2531
 
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 #pragma comment(lib, "Ws2_32.lib")
 
-#include <windows.h>
+//#include <windows.h>
 #include <Windowsx.h>
 #include <string>
+#include <WinSock2.h>
 #include "SetupWindow.h"
 #include "MainWindow.h"
 
@@ -48,8 +57,8 @@ extern WSADATA WSAData;
 
 extern struct sockaddr_in server;
 
-extern bool isClient;
-extern bool isTCP;
+extern int prog_type;
+extern int proto_type;
 
 extern HANDLE		hf;              // file handle
 extern OPENFILENAME ofn;			 // common dialog box structure
@@ -66,14 +75,18 @@ struct ServiceThreadParams {
 
 
 void ConnectClient ();
-void SetupAsServer (bool isTCP);
-void SetupAsClient (bool isTCP);
-DWORD WINAPI RunServer (LPVOID lpParam);
-void RunClient ();
+void SetupAsServer ();
+void SetupAsClient ();
+DWORD WINAPI RunTCPServer (LPVOID lpParam);
+DWORD WINAPI RunUDPServer (LPVOID lpParam);
+void RunTCPClient ();
+void RunUDPClient ();
 void ConnectServer ();
 void addLine (std::string line);
 int getLines ();
 std::string getLine (int line);
 void clearBox ();
+void GetConnectionParameters ();
+void CloseConnection ();
 
 #endif
