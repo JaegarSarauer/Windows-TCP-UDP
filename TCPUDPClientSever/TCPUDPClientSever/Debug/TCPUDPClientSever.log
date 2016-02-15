@@ -1,10 +1,28 @@
-﻿Build started 2/15/2016 2:44:06 AM.
-     1>Project "C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\TCPUDPClientSever\TCPUDPClientSever.vcxproj" on node 2 (Build target(s)).
+﻿Build started 2016-02-15 6:20:32 AM.
+     1>Project "D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\TCPUDPClientSever\TCPUDPClientSever.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt ServerConnection.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Application.cpp ClientConnection.cpp Connection.cpp FileOpener.cpp Packetizer.cpp ServerConnection.cpp
          ServerConnection.cpp
+         Packetizer.cpp
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\packetizer.cpp(48): warning C4018: '<': signed/unsigned mismatch
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\packetizer.cpp(74): warning C4018: '<': signed/unsigned mismatch
+         FileOpener.cpp
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(133): warning C4244: '=': conversion from 'std::streamoff' to 'int', possible loss of data
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(141): warning C4244: '=': conversion from 'std::streamoff' to 'int', possible loss of data
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(123): warning C4101: 'idx': unreferenced local variable
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(210): warning C4101: 'idx': unreferenced local variable
+         Connection.cpp
+         ClientConnection.cpp
+         Application.cpp
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\application.cpp(397): warning C4800: 'LRESULT': forcing value to bool 'true' or 'false' (performance warning)
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\application.cpp(422): warning C4800: 'LRESULT': forcing value to bool 'true' or 'false' (performance warning)
+         Generating Code...
+     1>d:\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(151): warning C4715: 'loadFileToView': not all control paths return a value
+       ResourceCompile:
+         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\rc.exe /l"0x0409" /nologo /fo"Debug\MainWindow.res" MainWindow.rc 
+         C:\Program Files (x86)\Windows Kits\8.1\bin\x86\rc.exe /l"0x0409" /nologo /fo"Debug\SetupWindow.res" SetupWindow.rc 
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.lib" /MACHINE:X86 Debug\MainWindow.res
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.lib" /MACHINE:X86 Debug\MainWindow.res
          Debug\SetupWindow.res
          Debug\Application.obj
          Debug\ClientConnection.obj
@@ -12,9 +30,10 @@
          Debug\FileOpener.obj
          Debug\Packetizer.obj
          Debug\ServerConnection.obj
-         TCPUDPClientSever.vcxproj -> C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.exe
-     1>Done Building Project "C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\TCPUDPClientSever\TCPUDPClientSever.vcxproj" (Build target(s)).
+         LINK : D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.exe not found or not built by the last incremental link; performing full link
+         TCPUDPClientSever.vcxproj -> D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\Debug\TCPUDPClientSever.exe
+     1>Done Building Project "D:\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\TCPUDPClientSever\TCPUDPClientSever.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:01.17
+Time Elapsed 00:00:08.60
