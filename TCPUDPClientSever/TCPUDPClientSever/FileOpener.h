@@ -164,7 +164,7 @@ DWORD WINAPI loadFileToView(LPVOID lpParam);
 --					specified edit control into the new, or previously created file (overwriting previous data).
 --
 -------------------------------------------------------------------------------------------------------------------*/
-void saveFileToComputer (const HWND *box, LPSTR file);
+void saveFileToComputer (LPSTR file);
 
 
 #endif

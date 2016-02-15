@@ -217,6 +217,13 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 						//loadFileToView (ofn.lpstrFile);
 					}
 					break;
+				case IDC_SAVE_BUTTON:
+					setFileOpenerFlags(SAVE_BROWSER);
+					if (GetOpenFileName(&ofn) == TRUE) {
+						CreateThread(NULL, 0, createFileWriter, NULL, 0, NULL);
+						saveFileToComputer (ofn.lpstrFile);
+					}
+					break;
 				case IDC_EXIT_BUTTON:
 				case IDC_EXIT_START:
 					CloseConnection ();

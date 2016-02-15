@@ -64,13 +64,12 @@ void RunTCPClient() {
 	Packetizer packetizer = Packetizer();
 	GetSystemTime(&sysStart);
 	if (false_data) {
-		while (packets_to_send > 0) {
+		while (packets_to_send-- > 0) {
 			send(ProgSocket, packetizer.getFakePacket().c_str(), packet_size, 0);
-			stats->packets++;
-			updateStatsWindow(stats);
-			packets_to_send--;
-			GetSystemTime(&sysEnd);
-			stats->time = packetDelay(sysStart, sysEnd);
+			//stats->packets++;
+			//updateStatsWindow(stats);
+			//GetSystemTime(&sysEnd);
+			//stats->time = packetDelay(sysStart, sysEnd);
 		}
 	}
 	else {
@@ -94,12 +93,11 @@ void RunUDPClient() {
 	int server_len = sizeof(server);
 	GetSystemTime(&sysStart);
 	if (false_data) {
-		while (packets_to_send > 0) {
+		while (packets_to_send-- > 0) {
 			sendto(ProgSocket, packetizer.getFakePacket().c_str(), packet_size, 0, (struct sockaddr *)&server, server_len);
 			packetizer.updatePacketList();
 			stats->packets++;
 			updateStatsWindow(stats);
-			packets_to_send--;
 			GetSystemTime(&sysEnd);
 			stats->time = packetDelay(sysStart, sysEnd);
 		}
