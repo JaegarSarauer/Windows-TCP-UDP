@@ -10,6 +10,7 @@ DWORD WINAPI RunTCPServer(LPVOID lpParam) {
 	int dataRead, dataToRead;
 	char *inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 	bool transmissionEnded = FALSE;
+	bool firstRead = TRUE;
 
 
 	//set socket to non-blocking
@@ -26,7 +27,6 @@ DWORD WINAPI RunTCPServer(LPVOID lpParam) {
 		if ((ReadSocket = accept(param->ConnectionSocket, (struct sockaddr *)&client, &client_len)) != -1) {
 			dataToRead = packet_size;
 			transmissionEnded = FALSE;
-			GetSystemTime(&sysStart);
 			do {
 				while ((dataRead = recv(ReadSocket, inputBuffer, dataToRead, 0)) < dataToRead && !transmissionEnded) {
 					if (dataRead == 0)
@@ -38,6 +38,10 @@ DWORD WINAPI RunTCPServer(LPVOID lpParam) {
 					}
 				}
 				if (!transmissionEnded) {
+					if (firstRead) {
+						firstRead = FALSE;
+						GetSystemTime(&sysStart);
+					}
 					if (show_data)
 						addLine(std::string(inputBuffer));
 					stats->packets++;
@@ -48,6 +52,7 @@ DWORD WINAPI RunTCPServer(LPVOID lpParam) {
 					inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 				}
 			} while (!transmissionEnded);
+			firstRead = TRUE;
 			closesocket(ReadSocket);
 			GetSystemTime(&sysEnd);
 			stats->time = packetDelay(sysStart, sysEnd);
