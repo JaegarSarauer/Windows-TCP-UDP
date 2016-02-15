@@ -71,9 +71,10 @@ bool Packetizer::availablePacket() {
 std::string Packetizer::getFakePacket() {
 	std::string tmp;
 	int j;
-	for (size_t i = 0; i < packet_size; i++) {
+	for (size_t i = 0; i < packet_size - 1; i++) {
 		j = (i < 26) ? i : i % 26;
-		tmp[i] = 'a' + j;
+		tmp += 'a' + j;
 	}
+	tmp += '\0';
 	return tmp;
 }

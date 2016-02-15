@@ -1,6 +1,7 @@
 #ifndef OPENFILE_H
 #define OPENFILE_H
 #define MAX_FILE	1000000
+#define READ_CHUNK	4096
 
 #include "Shared.h"
 #include <commctrl.h>

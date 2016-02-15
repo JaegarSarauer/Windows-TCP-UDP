@@ -1,8 +1,8 @@
 #ifndef SHARED_H
 #define SHARED_H
 
-#define DEFAULT_PORT_NUMBER		4500
-#define DEFAULT_BUFFER_SIZE		512
+#define DEFAULT_PORT_NUMBER		7013
+#define DEFAULT_BUFFER_SIZE		32768
 
 #define PROTOCOL_TCP			455
 #define PROTOCOL_UDP			456
@@ -68,6 +68,7 @@ extern int packets_to_send;
 extern HANDLE		hf;              // file handle
 extern OPENFILENAME ofn;			 // common dialog box structure
 
+
 void StartServerThread ();
 void CreateSocket ();
 
@@ -102,5 +103,6 @@ std::string getLine (int line);
 void clearBox ();
 void GetConnectionParameters ();
 void CloseConnection ();
+long packetDelay(SYSTEMTIME t1, SYSTEMTIME t2);
 
 #endif

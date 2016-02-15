@@ -2,13 +2,13 @@
 
 struct sockaddr_in server;
 
-
 DWORD WINAPI RunTCPServer(LPVOID lpParam) {
+	SYSTEMTIME sysStart, sysEnd;
 	ServiceThreadParams *param = (ServiceThreadParams *)lpParam;
 	struct sockaddr_in client;
 	SOCKET ReadSocket;
 	int dataRead, dataToRead;
-	char *inputBuffer = (char *)malloc(packet_size * sizeof(char));
+	char *inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 	bool transmissionEnded = FALSE;
 
 
@@ -26,38 +26,46 @@ DWORD WINAPI RunTCPServer(LPVOID lpParam) {
 		if ((ReadSocket = accept(param->ConnectionSocket, (struct sockaddr *)&client, &client_len)) != -1) {
 			dataToRead = packet_size;
 			transmissionEnded = FALSE;
+			GetSystemTime(&sysStart);
 			do {
-				while ((dataRead = recv(ReadSocket, inputBuffer, dataToRead, 0)) < packet_size && !transmissionEnded) {
+				while ((dataRead = recv(ReadSocket, inputBuffer, dataToRead, 0)) < dataToRead && !transmissionEnded) {
 					if (dataRead == 0)
 						transmissionEnded = TRUE;
 					if (dataRead != -1 && WSAGetLastError() != WSAEWOULDBLOCK) {
 						//if (*inputBuffer == (char)4)
 						inputBuffer += dataRead;
 						dataToRead -= dataRead;
-						if (dataRead == 0)
-							break;
 					}
 				}
 				if (!transmissionEnded) {
-					addLine(std::string(inputBuffer));
+					if (show_data)
+						addLine(std::string(inputBuffer));
 					stats->packets++;
 					updateStatsWindow(stats);
-					inputBuffer = (char *)malloc(packet_size * sizeof(char));
+					dataToRead = packet_size;
+					GetSystemTime(&sysEnd);
+					stats->time = packetDelay(sysStart, sysEnd);
+					inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 				}
 			} while (!transmissionEnded);
 			closesocket(ReadSocket);
+			GetSystemTime(&sysEnd);
+			stats->time = packetDelay(sysStart, sysEnd);
 		}
 	}
+
 	return 0;
 }
 
 DWORD WINAPI RunUDPServer(LPVOID lpParam) {
+	SYSTEMTIME sysStart, sysEnd;
 	ServiceThreadParams *param = (ServiceThreadParams *)lpParam;
 	struct sockaddr_in client;
 	int dataRead;
 	char *inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 	bool transmissionEnded = FALSE;
 
+	bool hasRead = FALSE;
 
 	//set socket to non-blocking
 	u_long iMode = 1;
@@ -68,14 +76,19 @@ DWORD WINAPI RunUDPServer(LPVOID lpParam) {
 		transmissionEnded = FALSE;
 		if ((dataRead = recvfrom(ProgSocket, inputBuffer, packet_size, 0, (struct sockaddr *)&client, &client_len))) {
 			if (dataRead != -1 && WSAGetLastError() != WSAEWOULDBLOCK) {
-				inputBuffer[dataRead] = '\0';
-				addLine(std::string(inputBuffer));
+				if (show_data) {
+					inputBuffer[dataRead] = '\0';
+					addLine(std::string(inputBuffer));
+				}
+				if (!hasRead) {
+					GetSystemTime(&sysStart);
+					hasRead = TRUE;
+				}
 				stats->packets++;
 				updateStatsWindow(stats);
 				inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
-			}
-			else {
-				transmissionEnded = TRUE;
+				GetSystemTime(&sysEnd);
+				stats->time = packetDelay(sysStart, sysEnd);
 			}
 		}
 	}

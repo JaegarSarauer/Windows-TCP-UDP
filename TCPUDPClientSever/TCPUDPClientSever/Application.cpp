@@ -197,6 +197,7 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 							CloseConnection ();
 							break;
 						case PROGRAM_SERVER:
+							CloseConnection();
 							ConnectServer ();
 							if (Connection_Setup) {
 								stats->status = "Waiting for Data...";
@@ -268,6 +269,8 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 //adds a line to whatever handle you would like. It is expected to pass in a file holder as the handle.
 void addLine (std::string line) {
 	int idx;
+	if (line == "")
+		return;
 	HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
 
 	idx = GetWindowTextLength (box);
@@ -361,8 +364,11 @@ std::string getLine (int line) {
 -------------------------------------------------------------------------------------------------------------------*/
 void clearBox () {
 	SetWindowText (GetDlgItem (hMain, IDC_DATA_BOX), "");
+	stats->status = "Waiting for Action";
 	stats->fileLoad = 0;
 	stats->fileLoadTotal = 0;
+	stats->packets = 0;
+	stats->time = 0;
 	updateStatsWindow(stats);
 }
 

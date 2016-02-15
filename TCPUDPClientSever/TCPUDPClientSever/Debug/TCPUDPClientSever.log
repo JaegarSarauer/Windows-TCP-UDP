@@ -1,13 +1,11 @@
-﻿Build started 2/15/2016 12:29:01 AM.
+﻿Build started 2/15/2016 2:18:57 AM.
      1>Project "C:\Users\Administrator\Documents\GitHub\Windows-TCP-UDP\TCPUDPClientSever\TCPUDPClientSever\TCPUDPClientSever.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Application.cpp ClientConnection.cpp Connection.cpp FileOpener.cpp Packetizer.cpp ServerConnection.cpp
-         Application.cpp
-     1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\application.cpp(391): warning C4800: 'LRESULT': forcing value to bool 'true' or 'false' (performance warning)
-     1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\application.cpp(416): warning C4800: 'LRESULT': forcing value to bool 'true' or 'false' (performance warning)
+         ServerConnection.cpp
+         ClientConnection.cpp
          Generating Code...
          Compiling...
-         ServerConnection.cpp
          Packetizer.cpp
      1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\packetizer.cpp(48): warning C4018: '<': signed/unsigned mismatch
      1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\packetizer.cpp(74): warning C4018: '<': signed/unsigned mismatch
@@ -17,7 +15,9 @@
      1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(123): warning C4101: 'idx': unreferenced local variable
      1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(210): warning C4101: 'idx': unreferenced local variable
          Connection.cpp
-         ClientConnection.cpp
+         Application.cpp
+     1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\application.cpp(397): warning C4800: 'LRESULT': forcing value to bool 'true' or 'false' (performance warning)
+     1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\application.cpp(422): warning C4800: 'LRESULT': forcing value to bool 'true' or 'false' (performance warning)
          Generating Code...
      1>c:\users\administrator\documents\github\windows-tcp-udp\tcpudpclientsever\tcpudpclientsever\fileopener.cpp(151): warning C4715: 'loadFileToView': not all control paths return a value
        Link:
@@ -34,4 +34,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:05.45
+Time Elapsed 00:00:05.09

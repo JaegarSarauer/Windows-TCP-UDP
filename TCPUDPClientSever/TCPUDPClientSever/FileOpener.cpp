@@ -121,7 +121,7 @@ DWORD WINAPI createFileWriter (LPVOID lpParam) {
 -------------------------------------------------------------------------------------------------------------------*/
 DWORD WINAPI loadFileToView(LPVOID lpParam) {
 	int idx;
-	char tmp[4096] = "";
+	char tmp[READ_CHUNK] = "";
 	HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
 	clearBox();
 
@@ -136,7 +136,7 @@ DWORD WINAPI loadFileToView(LPVOID lpParam) {
 
 	std::ifstream inputF ((LPSTR)lpParam);
 	SendMessage (box, EM_SETREADONLY, (LPARAM)FALSE, NULL);
-	while (inputF.read (tmp, 4095)) {
+	while (inputF.read (tmp, READ_CHUNK - 1)) {
 		tmp[inputF.gcount()] = '\0';
 		stats->fileLoad = inputF.tellg();
 		updateStatsWindow(stats);

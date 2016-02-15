@@ -37,12 +37,12 @@ void ConnectClient() {
 
 	// Copy the server address
 	memcpy((char *)&server.sin_addr, hp->h_addr, hp->h_length);
-	if (IPAddress != LOCAL_IP)
+	/*if (IPAddress != LOCAL_IP)
 		if (bind(ProgSocket, (struct sockaddr *)&server, sizeof(server)) == -1) {
 			CloseConnection();
 			MessageBox(hwnd, "Unable to bind to socket", "Unable to Bind", MB_OK);
 			return;
-		}
+		}*/
 
 	// Connecting to the server
 	if (connect(ProgSocket, (struct sockaddr *)&server, sizeof(server)) == -1) {
@@ -60,13 +60,17 @@ void ConnectClient() {
 }
 
 void RunTCPClient() {
+	SYSTEMTIME sysStart, sysEnd;
 	Packetizer packetizer = Packetizer();
+	GetSystemTime(&sysStart);
 	if (false_data) {
 		while (packets_to_send > 0) {
 			send(ProgSocket, packetizer.getFakePacket().c_str(), packet_size, 0);
 			stats->packets++;
 			updateStatsWindow(stats);
 			packets_to_send--;
+			GetSystemTime(&sysEnd);
+			stats->time = packetDelay(sysStart, sysEnd);
 		}
 	}
 	else {
@@ -76,6 +80,8 @@ void RunTCPClient() {
 			packetizer.updatePacketList();
 			stats->packets++;
 			updateStatsWindow(stats);
+			GetSystemTime(&sysEnd);
+			stats->time = packetDelay(sysStart, sysEnd);
 		}
 	}
 	closesocket(ProgSocket);
@@ -83,8 +89,10 @@ void RunTCPClient() {
 }
 
 void RunUDPClient() {
+	SYSTEMTIME sysStart, sysEnd;
 	Packetizer packetizer = Packetizer();
 	int server_len = sizeof(server);
+	GetSystemTime(&sysStart);
 	if (false_data) {
 		while (packets_to_send > 0) {
 			sendto(ProgSocket, packetizer.getFakePacket().c_str(), packet_size, 0, (struct sockaddr *)&server, server_len);
@@ -92,6 +100,8 @@ void RunUDPClient() {
 			stats->packets++;
 			updateStatsWindow(stats);
 			packets_to_send--;
+			GetSystemTime(&sysEnd);
+			stats->time = packetDelay(sysStart, sysEnd);
 		}
 	} else {
 		packetizer.appendPackets();
@@ -100,6 +110,8 @@ void RunUDPClient() {
 			packetizer.updatePacketList();
 			stats->packets++;
 			updateStatsWindow(stats);
+			GetSystemTime(&sysEnd);
+			stats->time = packetDelay(sysStart, sysEnd);
 		}
 	}
 	closesocket(ProgSocket);
