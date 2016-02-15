@@ -138,8 +138,8 @@ DWORD WINAPI createFileWriter (LPVOID lpParam);
 --					handle (normally an Edit Box). In order for this to populate the correctly, the function must find
 --					the end of the file each time it appends a line to the handle, to prevent file overwrites.
 -------------------------------------------------------------------------------------------------------------------*/
-void loadFileToView (LPSTR file);
-
+//void loadFileToView (LPSTR file);
+DWORD WINAPI loadFileToView(LPVOID lpParam);
 
 /*------------------------------------------------------------------------------------------------------------------
 --	FUNCTION:		saveFileToComputer

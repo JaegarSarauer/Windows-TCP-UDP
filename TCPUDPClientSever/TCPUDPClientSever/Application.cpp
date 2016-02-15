@@ -200,8 +200,9 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 				case IDC_OPEN_BUTTON:
 					setFileOpenerFlags (OPEN_BROWSER);
 					if (GetOpenFileName (&ofn) == TRUE) {
-						CreateThread (NULL, 0, createFileReader, NULL, 0, NULL);
-						loadFileToView (ofn.lpstrFile);
+						CreateThread(NULL, 0, createFileReader, NULL, 0, NULL);
+						CreateThread(NULL, 0, loadFileToView, ofn.lpstrFile, 0, NULL);
+						//loadFileToView (ofn.lpstrFile);
 					}
 					break;
 				case IDC_EXIT_BUTTON:
@@ -349,6 +350,9 @@ std::string getLine (int line) {
 -------------------------------------------------------------------------------------------------------------------*/
 void clearBox () {
 	SetWindowText (GetDlgItem (hMain, IDC_DATA_BOX), "");
+	stats->fileLoad = 0;
+	stats->fileLoadTotal = 0;
+	updateStatsWindow(stats);
 }
 
 

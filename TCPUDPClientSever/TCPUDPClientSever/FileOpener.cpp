@@ -119,25 +119,69 @@ DWORD WINAPI createFileWriter (LPVOID lpParam) {
 --					handle (normally an Edit Box). In order for this to populate the correctly, the function must find
 --					the end of the file each time it appends a line to the handle, to prevent file overwrites.
 -------------------------------------------------------------------------------------------------------------------*/
-void loadFileToView (LPSTR file) {
+DWORD WINAPI loadFileToView(LPVOID lpParam) {
 	int idx;
-	std::string tmp;
+	char tmp[4096] = "";
 	HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
+	clearBox();
 
-	std::ifstream inputF (file);
-	clearBox ();
+	std::streampos fsize = 0;
+	std::ifstream filecount((LPSTR)lpParam, std::ios::binary);
+
+	fsize = filecount.tellg();
+	filecount.seekg(0, std::ios::end);
+	stats->fileLoadTotal = filecount.tellg() - fsize;
+	filecount.close();
+	updateStatsWindow(stats);
+
+	std::ifstream inputF ((LPSTR)lpParam);
 	SendMessage (box, EM_SETREADONLY, (LPARAM)FALSE, NULL);
-	while (getline (inputF, tmp)) {
-		tmp += "\n";
-		idx = GetWindowTextLength (box);
-		SendMessage (box, EM_SETSEL, (LPARAM)idx, (LPARAM)idx);
-		SendMessage (box, EM_REPLACESEL, 0, (LPARAM)(tmp.c_str ()));
+	while (inputF.read (tmp, 4095)) {
+		tmp[inputF.gcount()] = '\0';
+		stats->fileLoad = inputF.tellg();
+		updateStatsWindow(stats);
+		addLine(tmp);
 	}
+	tmp[inputF.gcount()] = '\0';
+	stats->fileLoad = stats->fileLoadTotal;
+	updateStatsWindow(stats);
+	addLine(tmp);
 
 	inputF.close ();
 }
 
+/*
+void loadFileToView (LPSTR file) {
+int idx;
+char tmp[4096] = "";
+HWND box = GetDlgItem (hMain, IDC_DATA_BOX);
 
+std::streampos fsize = 0;
+std::ifstream filecount(file, std::ios::binary);
+
+fsize = filecount.tellg();
+filecount.seekg(0, std::ios::end);
+stats->fileLoadTotal = filecount.tellg() - fsize;
+filecount.close();
+updateStatsWindow(stats);
+
+std::ifstream inputF (file);
+clearBox ();
+SendMessage (box, EM_SETREADONLY, (LPARAM)FALSE, NULL);
+while (inputF.read (tmp, 4095)) {
+tmp[inputF.gcount()] = '\0';
+stats->fileLoad = inputF.tellg();
+updateStatsWindow(stats);
+addLine(tmp);
+}
+tmp[inputF.gcount()] = '\0';
+stats->fileLoad = stats->fileLoadTotal;
+updateStatsWindow(stats);
+addLine(tmp);
+
+inputF.close ();
+}
+*/
 
 /*------------------------------------------------------------------------------------------------------------------
 --	FUNCTION:		saveFileToComputer

@@ -65,6 +65,8 @@ void RunTCPClient () {
 	while (packetizer.availablePacket ()) {
 		send (ProgSocket, packetizer.getPacket ().c_str (), packet_size, 0);
 		packetizer.updatePacketList ();
+		stats->packets++;
+		updateStatsWindow(stats);
 	}
 	closesocket (ProgSocket);
 	Connection_Setup = FALSE;
@@ -77,6 +79,8 @@ void RunUDPClient () {
 	while (packetizer.availablePacket ()) {
 		sendto (ProgSocket, packetizer.getPacket ().c_str (), packet_size, 0, (struct sockaddr *)&server, server_len);
 		packetizer.updatePacketList ();
+		stats->packets++;
+		updateStatsWindow(stats);
 	}
 	closesocket (ProgSocket);
 	Connection_Setup = FALSE;
