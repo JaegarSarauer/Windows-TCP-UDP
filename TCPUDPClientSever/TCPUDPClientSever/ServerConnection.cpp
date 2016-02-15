@@ -64,8 +64,9 @@ DWORD WINAPI RunUDPServer(LPVOID lpParam) {
 	int dataRead;
 	char *inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 	bool transmissionEnded = FALSE;
+	int misRead = 4000000;
 
-	bool hasRead = FALSE;
+	bool hasReadData = FALSE;
 
 	//set socket to non-blocking
 	u_long iMode = 1;
@@ -76,19 +77,23 @@ DWORD WINAPI RunUDPServer(LPVOID lpParam) {
 		transmissionEnded = FALSE;
 		if ((dataRead = recvfrom(ProgSocket, inputBuffer, packet_size, 0, (struct sockaddr *)&client, &client_len))) {
 			if (dataRead != -1 && WSAGetLastError() != WSAEWOULDBLOCK) {
+				misRead = 4000000;
 				if (show_data) {
 					inputBuffer[dataRead] = '\0';
 					addLine(std::string(inputBuffer));
 				}
-				if (!hasRead) {
+				if (!hasReadData) {
 					GetSystemTime(&sysStart);
-					hasRead = TRUE;
+					hasReadData = TRUE;
 				}
 				stats->packets++;
 				updateStatsWindow(stats);
 				inputBuffer = (char *)malloc(MAX_BUFFER * sizeof(char));
 				GetSystemTime(&sysEnd);
 				stats->time = packetDelay(sysStart, sysEnd);
+			} else {
+				if (--misRead <= 0)
+					hasReadData = FALSE;
 			}
 		}
 	}
