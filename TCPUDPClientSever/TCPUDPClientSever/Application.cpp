@@ -27,8 +27,9 @@ int proto_type;
 
 bool Connection_Setup = FALSE;
 
-bool show_data;
-bool false_data = FALSE;
+bool show_data; 
+bool false_data;
+int packets_to_send;
 
 struct Statistics *stats;
 

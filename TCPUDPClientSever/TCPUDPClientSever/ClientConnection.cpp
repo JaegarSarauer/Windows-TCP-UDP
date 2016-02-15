@@ -93,8 +93,7 @@ void RunUDPClient() {
 			updateStatsWindow(stats);
 			packets_to_send--;
 		}
-	}
-	else {
+	} else {
 		packetizer.appendPackets();
 		while (packetizer.availablePacket()) {
 			sendto(ProgSocket, packetizer.getPacket().c_str(), packet_size, 0, (struct sockaddr *)&server, server_len);

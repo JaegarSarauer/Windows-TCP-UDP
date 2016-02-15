@@ -15,9 +15,9 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 int WINAPI WinMain (HINSTANCE hInst, HINSTANCE hprevInstance,
 	LPSTR lspszCmdParam, int nCmdShow);
 
+void updateStatsWindow(struct Statistics *s);
 void showDataChecked();
 void falseDataChecked();
-void updateStatsWindow(struct Statistics *s);
-
+void getPacketsToSend();
 
 #endif
