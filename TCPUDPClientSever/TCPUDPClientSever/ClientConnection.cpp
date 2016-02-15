@@ -29,8 +29,9 @@ void ConnectClient () {
 	server.sin_family = AF_INET;
 	server.sin_port = htons (port);
 	if ((hp = gethostbyname (IPAddress)) == NULL) {
-		fprintf (stderr, "Unknown server address\n");
-		exit (1);
+		CloseConnection ();
+		MessageBox (hwnd, "Unknown Server Address", "Unable to find IP", MB_OK);
+		return;
 	}
 
 

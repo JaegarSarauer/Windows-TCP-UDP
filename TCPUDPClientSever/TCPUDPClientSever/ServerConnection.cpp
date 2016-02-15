@@ -52,7 +52,7 @@ DWORD WINAPI RunUDPServer (LPVOID lpParam) {
 	ServiceThreadParams *param = (ServiceThreadParams *)lpParam;
 	struct sockaddr_in client;
 	int dataRead;
-	char *inputBuffer = (char *)malloc (packet_size * sizeof (char));
+	char *inputBuffer = (char *)malloc (MAX_BUFFER * sizeof (char));
 	bool transmissionEnded = FALSE;
 
 
@@ -65,8 +65,9 @@ DWORD WINAPI RunUDPServer (LPVOID lpParam) {
 		transmissionEnded = FALSE;
 		if ((dataRead = recvfrom (ProgSocket, inputBuffer, packet_size, 0, (struct sockaddr *)&client, &client_len))) {
 			if (dataRead != -1 && WSAGetLastError () != WSAEWOULDBLOCK) {
+				inputBuffer[dataRead] = '\0';
 				addLine (std::string (inputBuffer));
-				inputBuffer = (char *)malloc (packet_size * sizeof (char));
+				inputBuffer = (char *)malloc (MAX_BUFFER * sizeof (char));
 			} else {
 				transmissionEnded = TRUE;
 			}
