@@ -44,6 +44,8 @@ class Packetizer {
 	//returns true if there is a packet in the list.
 	bool availablePacket ();
 
+	std::string getFakePacket();
+
 	private:
 	long currentLine;
 	std::deque<std::string> packet_list;

@@ -62,6 +62,8 @@ extern struct sockaddr_in server;
 extern int prog_type;
 extern int proto_type;
 extern bool show_data;
+extern bool false_data;
+extern int packets_to_send;
 
 extern HANDLE		hf;              // file handle
 extern OPENFILENAME ofn;			 // common dialog box structure

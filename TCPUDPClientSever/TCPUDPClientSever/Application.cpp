@@ -28,6 +28,7 @@ int proto_type;
 bool Connection_Setup = FALSE;
 
 bool show_data;
+bool false_data = FALSE;
 
 struct Statistics *stats;
 
@@ -95,7 +96,7 @@ void StartMainWindow () {
 	SendMessage (GetDlgItem (hMain, IDC_PORT_EDIT), EM_SETLIMITTEXT, (LPARAM)tmpSize, NULL);
 	SendMessage (GetDlgItem (hMain, IDC_PACKET_SIZE), EM_SETLIMITTEXT, (LPARAM)tmpSize, NULL);
 	SendMessage (GetDlgItem (hMain, IDC_SHOW_DATA), BM_SETCHECK, BST_CHECKED, 0);
-	checkBoxChecked ();
+	showDataChecked ();
 
 	//set a default port number in GUI
 	sprintf_s (tmp, "%d", port);
@@ -149,8 +150,15 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 				case IDC_SHOW_DATA:
 					switch (HIWORD (wParam)) {
 						case BN_CLICKED:
-							checkBoxChecked ();
+							showDataChecked ();
 							break;
+					}
+					break;
+				case IDC_FALSE_DATA:
+					switch (HIWORD(wParam)) {
+					case BN_CLICKED:
+						falseDataChecked();
+						break;
 					}
 					break;
 				case IDC_CLEAR_BUTTON:
@@ -168,6 +176,8 @@ INT_PTR CALLBACK WndProc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 						case PROGRAM_CLIENT:
 							ConnectClient ();
 							if (Connection_Setup) {
+								if (false_data)
+									getPacketsToSend();
 								stats->status = "Sending Data...";
 								updateStatsWindow (stats);
 								switch (proto_type) {
@@ -376,7 +386,38 @@ void clearBox () {
 --					to be called when the user clicks on the checkbox,
 --					allowing the status to be updated.
 -------------------------------------------------------------------------------------------------------------------*/
-void checkBoxChecked () {
+void showDataChecked () {
 	show_data = SendMessage (GetDlgItem (hMain, IDC_SHOW_DATA), BM_GETCHECK, 0, 0);
 	ShowWindow (GetDlgItem (hMain, IDC_DATA_BOX), show_data);
+}
+
+/*------------------------------------------------------------------------------------------------------------------
+--	FUNCTION:		checkBoxChecked
+--
+--	DATE:			November 30th, 2015
+--
+--	DESIGNER:		Jaegar Sarauer
+--
+--	REVISIONS:		Jaegar Sarauer - Version 1
+--
+--	PROGRAMMER:		Jaegar Sarauer
+--
+--	INTERFACE:		void checkBoxChecked();
+--
+--	RETURNS:		VOID
+--
+--	NOTES: 			This function updates the priority from the check
+--					box on the GUI, next to the "Send" button. It is intended
+--					to be called when the user clicks on the checkbox,
+--					allowing the status to be updated.
+-------------------------------------------------------------------------------------------------------------------*/
+void falseDataChecked() {
+	false_data = SendMessage(GetDlgItem(hMain, IDC_FALSE_DATA), BM_GETCHECK, 0, 0);
+}
+
+
+void getPacketsToSend() {
+	char tmp[8];
+	GetWindowText(GetDlgItem(hMain, IDC_PACKET_COUNT), tmp, tmpSize);
+	packets_to_send = atoi(tmp);
 }
