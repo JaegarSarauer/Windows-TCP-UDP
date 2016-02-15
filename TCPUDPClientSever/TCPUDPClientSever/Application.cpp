@@ -21,7 +21,6 @@ int commandID;
 int port = DEFAULT_PORT_NUMBER;
 int packet_size = DEFAULT_BUFFER_SIZE;
 
-struct Statistics *stats;
 
 int prog_type;
 int proto_type;
@@ -29,6 +28,8 @@ int proto_type;
 bool Connection_Setup = FALSE;
 
 bool show_data;
+
+struct Statistics *stats;
 
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hprevInstance,
@@ -45,8 +46,7 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hprevInstance,
 	SendMessage(GetDlgItem(hStart, IDC_CLIENT_RADIO), BM_SETCHECK, BST_CHECKED, NULL);
 	SendMessage(GetDlgItem(hStart, IDC_TCP_RADIO), BM_SETCHECK, BST_CHECKED, NULL);
 
-	stats = (Statistics *)malloc(sizeof(Statistics));
-	stats = new Statistics();
+	stats = new Statistics;
 	stats->status = "Waiting";
 
 	stats->fileLoad = 0;
@@ -133,10 +133,10 @@ void updateStatsWindow(struct Statistics *s) {
 	char tmp[1024];
 	switch (prog_type) {
 	case PROGRAM_CLIENT:
-		sprintf_s(tmp, "Status: %s\r\nFile Loaded: %d/%d\r\nPackets Sent: %d\r\nTransfer Time: %ul", s->status, s->fileLoad, s->fileLoadTotal, s->packets, s->time);
+		sprintf_s(tmp, "Status: %s\r\nFile Loaded: %d/%d\r\nPackets Sent: %d\r\nTransfer Time: %ld", s->status, s->fileLoad, s->fileLoadTotal, s->packets, s->time);
 		break;
 	case PROGRAM_SERVER:
-		sprintf_s(tmp, "Status: %s\r\nPackets Recieved: %d\r\nTransfer Time: %ul", s->status, s->packets, s->time);
+		sprintf_s(tmp, "Status: %s\r\nPackets Recieved: %d\r\nTransfer Time: %ld", s->status, s->packets, s->time);
 		break;
 	}
 	Edit_SetText(GetDlgItem(hMain, IDC_STATS_BOX), tmp);
@@ -177,6 +177,7 @@ INT_PTR CALLBACK WndProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 					default:
 						break;
 					}
+				CloseConnection ();
 				break;
 			case PROGRAM_SERVER:
 				ConnectServer();
@@ -186,7 +187,6 @@ INT_PTR CALLBACK WndProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			default:
 				break;
 			}
-			CloseConnection();
 			break;
 		case IDC_OPEN_BUTTON:
 			setFileOpenerFlags(OPEN_BROWSER);

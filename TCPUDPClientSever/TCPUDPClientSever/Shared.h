@@ -16,6 +16,8 @@
 #define SAVE_BROWSER	2530
 #define OPEN_BROWSER	2531
 
+#define LOCAL_IP "127.0.0.1"
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #pragma warning(disable: 4996)
 #pragma comment(lib, "Ws2_32.lib")
@@ -56,7 +58,6 @@ extern SOCKET ProgSocket;
 extern WSADATA WSAData;
 
 extern struct sockaddr_in server;
-extern struct Stats *stats;
 
 extern int prog_type;
 extern int proto_type;
@@ -75,14 +76,15 @@ struct ServiceThreadParams {
 	SOCKET ConnectionSocket;
 };
 
-struct Statistics {
-	std::string status;
+typedef struct Statistics {
+	char* status;
 	int fileLoad;
 	int fileLoadTotal;
 	int packets;
 	long time;
 } Stats;
 
+extern struct Statistics *stats;
 
 void ConnectClient ();
 void SetupAsServer ();

@@ -57,8 +57,8 @@ DWORD WINAPI RunUDPServer (LPVOID lpParam) {
 
 
 	//set socket to non-blocking
-	//u_long iMode = 1;
-	//ioctlsocket (ProgSocket, FIONBIO, &iMode);
+	u_long iMode = 1;
+	ioctlsocket (ProgSocket, FIONBIO, &iMode);
 
 	while (Connection_Setup) {
 		int client_len = sizeof (client);
@@ -92,11 +92,12 @@ void ConnectServer () {
 	server.sin_port = htons (port);
 	server.sin_addr.s_addr = htonl (INADDR_ANY); // Accept connections from any client
 
-	/*if (bind (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == SOCKET_ERROR) {
+	
+	if (bind (ProgSocket, (struct sockaddr *)&server, sizeof (server)) == SOCKET_ERROR) {
 		CloseConnection ();
 		MessageBox (hwnd, "Unable to bind to socket", "Unable to Bind", MB_OK);
 		return;
-	}*/
+	}
 
 
 
